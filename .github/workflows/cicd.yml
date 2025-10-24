@@ -13,29 +13,35 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Login to Docker Hub
-        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+        run: |
+          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
       - name: Build Docker Image
-        run: sudo docker build -t mamatha12345678/kcc-node-version-1:latest -t mamatha12345678/kcc-node-version-1:${{ github.sha }} -f backend/Dockerfile backend
-
-      - name: Push Docker Image
         run: |
-          sudo docker push mamatha12345678/kcc-node-version-1:latest
-          sudo docker push mamatha12345678/kcc-node-version-1:${{ github.sha }}
+          docker build \
+            -t mamatha12345678/kcc-node-version-1:latest \
+            -t mamatha12345678/kcc-node-version-1:${{ github.sha }} \
+            -f backend/Dockerfile backend
+
+      - name: Push Docker Images
+        run: |
+          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+          docker push mamatha12345678/kcc-node-version-1:latest
+          docker push mamatha12345678/kcc-node-version-1:${{ github.sha }}
 
   deploy:
     needs: build
     runs-on: self-hosted
     steps:
       - name: Pull Docker Image
-        run: sudo docker pull mamatha12345678/kcc-node-version-1:latest
+        run: docker pull mamatha12345678/kcc-node-version-1:latest
 
       - name: Remove Old Container (if exists)
-        run: sudo docker rm -f nodejs-app-container || true
+        run: docker rm -f nodejs-app-container || true
 
       - name: Run Docker Container
         run: |
-          sudo docker run -d -p 8000:8000 --name nodejs-app-container \
+          docker run -d -p 8000:8000 --name nodejs-app-container \
             -e MONGO_URI="${{ secrets.MONGO_URI }}" \
             -e JWT_SECRET="${{ secrets.JWT_SECRET }}" \
             -e JWT_EXPIRE="${{ secrets.JWT_EXPIRE }}" \
