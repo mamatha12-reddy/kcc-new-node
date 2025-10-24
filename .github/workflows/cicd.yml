@@ -1,51 +1,42 @@
 name: Deploy Node Application
 
-on:
+on: 
   push:
     branches:
       - main
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-
+    runs-on: self-hosted
     steps:
-      # 1️⃣ Checkout the repository
       - name: Checkout Source
         uses: actions/checkout@v4
 
-      # 2️⃣ Docker Hub login (non-interactive)
       - name: Login to Docker Hub
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
-      # 3️⃣ Build Docker image from backend folder
       - name: Build Docker Image
-        run: docker build -t mamatha12345678/kcc-node:latest -f backend/Dockerfile backend
+        run: docker build -t mamatha12345678/kcc-node -f backend/Dockerfile backend
 
-      # 4️⃣ Push Docker image to Docker Hub
       - name: Publish Image to Docker Hub
         run: docker push mamatha12345678/kcc-node:latest
 
   deploy:
     needs: build
     runs-on: self-hosted
-
     steps:
-      # 1️⃣ Pull the latest image
-      - name: Pull image from Docker Hub
+      - name: Pull Docker Image
         run: docker pull mamatha12345678/kcc-node:latest
 
-      # 2️⃣ Delete old container if it exists
-      - name: Delete old container
+      - name: Remove Old Container (if exists)
         run: docker rm -f nodejs-app-container || true
 
-      # 3️⃣ Run new container with environment variables
       - name: Run Docker Container
         run: |
           docker run -d -p 8000:8000 --name nodejs-app-container \
-            -e MONGO_URI='${{ secrets.MONGO_URI }}' \
-            -e JWT_SECRET='${{ secrets.JWT_SECRET }}' \
-            -e JWT_EXPIRE='${{ secrets.JWT_EXPIRE }}' \
-            -e PORT='${{ secrets.PORT }}' \
-            -e FRONTEND_URL='${{ secrets.FRONTEND_URL }}' \
+            -e MONGO_URI="${{ secrets.MONGO_URI }}" \
+            -e JWT_SECRET="${{ secrets.JWT_SECRET }}" \
+            -e JWT_EXPIRE="${{ secrets.JWT_EXPIRE }}" \
+            -e PORT="${{ secrets.PORT }}" \
+            -e FRONTEND_URL="${{ secrets.FRONTEND_URL }}" \
             mamatha12345678/kcc-node:latest
