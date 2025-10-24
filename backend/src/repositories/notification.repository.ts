@@ -131,7 +131,7 @@ const questionObjectIds: mongoose.Types.ObjectId[] = matchingQuestions
       .sort({ created_at: -1 })
       .skip(skip)
       .limit(limit)
-      .lean();
+      .lean() as unknown as INotification[];;
   
     if (notifications.length === 0) {
       return { notifications: [], total };
