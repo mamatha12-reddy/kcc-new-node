@@ -16,19 +16,19 @@ jobs:
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
       - name: Build Docker Image
-        run: sudo docker build -t mamatha12345678/kcc-node:latest -t mamatha12345678/kcc-node:${{ github.sha }} -f backend/Dockerfile backend
+        run: sudo docker build -t mamatha12345678/kcc-node-version-1:latest -t mamatha12345678/kcc-node-version-1:${{ github.sha }} -f backend/Dockerfile backend
 
       - name: Push Docker Image
         run: |
-          sudo docker push mamatha12345678/kcc-node:latest
-          sudo docker push mamatha12345678/kcc-node:${{ github.sha }}
+          sudo docker push mamatha12345678/kcc-node-version-1:latest
+          sudo docker push mamatha12345678/kcc-node-version-1:${{ github.sha }}
 
   deploy:
     needs: build
     runs-on: self-hosted
     steps:
       - name: Pull Docker Image
-        run: sudo docker pull mamatha12345678/kcc-node:latest
+        run: sudo docker pull mamatha12345678/kcc-node-version-1:latest
 
       - name: Remove Old Container (if exists)
         run: sudo docker rm -f nodejs-app-container || true
@@ -41,4 +41,4 @@ jobs:
             -e JWT_EXPIRE="${{ secrets.JWT_EXPIRE }}" \
             -e PORT="${{ secrets.PORT }}" \
             -e FRONTEND_URL="${{ secrets.FRONTEND_URL }}" \
-            mamatha12345678/kcc-node:latest
+            mamatha12345678/kcc-node-version-1:latest
