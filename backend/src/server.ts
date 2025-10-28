@@ -22,9 +22,23 @@ const PORT = config.port || 8000;
 
     // 2️⃣ Create HTTP + Socket.IO server
     const server = http.createServer(app);
+    const allowedOrigins = [
+      "https://your-project-name.vercel.app",
+      "http://localhost:3000",
+      process.env.FRONTEND_URL,
+    ].filter(Boolean); 
     const io = new Server(server, {
       cors: {
-        origin: process.env.FRONTEND_URL,
+        origin: function (origin, callback) {
+          // Allow requests with no origin (like mobile apps / curl)
+          if (!origin) return callback(null, true);
+    
+          if (allowedOrigins.includes(origin)) {
+            return callback(null, true);
+          } else {
+            return callback(new Error("Not allowed by CORS"));
+          }
+        },
         methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
         allowedHeaders: ["Content-Type", "Authorization"],
         credentials: true,
