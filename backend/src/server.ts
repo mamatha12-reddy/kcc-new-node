@@ -23,7 +23,7 @@ const PORT = config.port || 8000;
     // 2️⃣ Create HTTP + Socket.IO server
     const server = http.createServer(app);
     const allowedOrigins = [
-      "https://your-project-name.vercel.app",
+      "https://kcc-frontend-react-dm6urri1g.vercel.app",
       "http://localhost:3000",
       process.env.FRONTEND_URL,
     ].filter(Boolean); 
