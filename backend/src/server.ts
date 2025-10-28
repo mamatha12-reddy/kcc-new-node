@@ -25,7 +25,7 @@ const PORT = config.port || 8000;
     const allowedOrigins = [
       "https://kcc-frontend-react-dm6urri1g.vercel.app",
       "http://localhost:3000",
-      process.env.FRONTEND_URL,
+      process.env.FRONTEND_URL, 
     ].filter(Boolean); 
     const io = new Server(server, {
       cors: {
