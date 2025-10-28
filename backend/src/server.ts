@@ -18,7 +18,7 @@ const PORT = config.port || 8000;
 
     // 1️⃣ Connect to MongoDB
     await connectDB();
-    logger.info('MongoDB connected*********');
+    logger.info('MongoDB connected*********ted');
 
     // 2️⃣ Create HTTP + Socket.IO server
     const server = http.createServer(app);
